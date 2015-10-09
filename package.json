@@ -18,6 +18,7 @@
     "watch": "watchify example/example.js -o example/bundle.js -dv",
     "dev": "npm run watch & npm run server",
     "server": "node server.js",
+    "postversion": "git push && git push --tags",
     "demo": "browserify example/example.js > example/bundle.js && html-inline example/index.html | curl -sT- https://htmlb.in"
   },
   "author": "Nick Thomas <nichoth@gmail.com>",
