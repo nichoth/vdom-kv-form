@@ -2,15 +2,19 @@ var h = require('virtual-dom/h');
 var state = require('@nichoth/state');
 var struct = require('observ-struct');
 var map = require('lodash.map');
+var oArray = require('observ-array');
+var KVInput = require('vdom-kv-input');
 var noop = function(){};
 
 module.exports = KVForm;
 
 function KVForm(opts) {
   var s = state({
-    rows: opts.rows || {}
+    rows: oArray( (opts.rows || []).map(function(r, i) {
+      return KVInput(r);
+    }))
   });
-  s.renderRow = opts.renderRow || noop;
+
   return s;
 }
 
@@ -21,7 +25,7 @@ KVForm.render = function(state) {
     }
   }, [
     map(state.rows, function(r, i) {
-      return state.renderRow(r);
+      return KVInput.render(r);
     })
   ]);
 };

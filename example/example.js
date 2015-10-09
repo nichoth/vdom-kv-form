@@ -3,17 +3,19 @@ var h = require('virtual-dom/h');
 var Form = require('../KVForm.js');
 
 var state = Form({
-  rows: {
-    0: {example: 'row'}
-  },
-  renderRow: render
+  rows: [
+    {
+      field: 'my field',
+      value: 'my value'
+    }
+  ]
 });
 
 function render() {
   return h('div', ['example row']);
 }
 
-var virtualEl = Form.render(state);
+var virtualEl = Form.render( state() );
 var el = createElement(virtualEl);
 
 document.getElementById('content').appendChild(el);
