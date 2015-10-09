@@ -11,10 +11,6 @@ var state = Form({
   ]
 });
 
-function render() {
-  return h('div', ['example row']);
-}
-
 var virtualEl = Form.render( state() );
 var el = createElement(virtualEl);
 
