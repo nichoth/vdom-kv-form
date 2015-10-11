@@ -14,21 +14,25 @@ function KVForm(opts) {
       return KVInput({
         field: r.field,
         value: r.value,
+        onDelete: onDelete(i),
         onComplete: onComplete()
       });
     }))
   });
 
+
+  function onDelete(index) {
+    return function() {
+      s.rows.splice(index, 1);
+    };
+  }
+
   function onComplete() {
     return function() {
-      console.log("bla");
-      console.log(s());
-
       s.rows.push( KVInput({
-        onComplete: onComplete()
+        onComplete: onComplete(),
+        onDelete: onDelete(s.rows().length)
       }));
-
-      console.log(s());
     };
   }
 
@@ -40,9 +44,8 @@ KVForm.render = function render(state) {
     onsubmit: function(ev) {
       ev.preventDefault();
     }
-  }, [
-    map(state.rows, function(r, i) {
+  }, map(state.rows, function(r, i) {
       return KVInput.render(r);
     })
-  ]);
+  );
 };
