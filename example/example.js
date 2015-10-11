@@ -1,5 +1,5 @@
-var createElement = require('virtual-dom/create-element');
-var h = require('virtual-dom/h');
+var vdom = require('virtual-dom');
+var h = vdom.h;
 var Form = require('../KVForm.js');
 
 var state = Form({
@@ -11,7 +11,6 @@ var state = Form({
   ]
 });
 
-var virtualEl = Form.render( state() );
-var el = createElement(virtualEl);
-
-document.getElementById('content').appendChild(el);
+var loop = require('main-loop')( state(), Form.render, vdom );
+state(loop.update);
+document.getElementById('content').appendChild(loop.target);

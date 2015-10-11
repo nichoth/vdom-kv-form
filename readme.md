@@ -1,6 +1,6 @@
 # vdom kv form
 
-Editable list of keys and values, made with `virtual-dom`, compatible with raynos/mercury component interface.
+List of keys and values, easily editable with keyboard navigation. It's made with `virtual-dom` and compatible with mercury component interface.
 
 
 ## install
@@ -11,11 +11,10 @@ Editable list of keys and values, made with `virtual-dom`, compatible with rayno
 ## example
 
 ```js
-var createElement = require('virtual-dom/create-element');
-var h = require('virtual-dom/h');
-var Form = require('../KVForm.js');
+var vdom = require('virtual-dom');
+var h = vdom.h;
+var Form = require('vdom-kv-form');
 
-// returns `observ-struct` instance
 var state = Form({
   rows: [
     {
@@ -25,8 +24,7 @@ var state = Form({
   ]
 });
 
-var virtualEl = Form.render( state() );
-var el = createElement(virtualEl);
-
-document.getElementById('content').appendChild(el);
+var loop = require('main-loop')( state(), Form.render, vdom );
+state(loop.update);
+document.getElementById('content').appendChild(loop.target);
 ```
