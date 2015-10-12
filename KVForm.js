@@ -2,7 +2,6 @@ var h = require('virtual-dom/h');
 var state = require('@nichoth/state');
 var map = require('lodash.map');
 var oArray = require('observ-array');
-var value = require('observ');
 var KVInput = require('vdom-kv-input');
 var noop = function(){};
 
@@ -21,30 +20,25 @@ function KVForm(opts) {
 
   var s = state({
     rows: rows,
-    lastRowIsEmpty: value( KVForm.lastRowIsEmpty({rows: rows}) )
   });
 
 
   function onDelete(index) {
     return function() {
       s.rows.splice(index, 1);
-      s.lastRowIsEmpty.set(KVForm.lastRowIsEmpty(s));
     };
   }
 
   function onComplete() {
     return function(ev) {
 
-      if (!s.lastRowIsEmpty()) {
+      if ( lastRowIsEmpty( s.rows ) ) {
         ev.preventDefault();
         addRow(s, {
           onComplete: onComplete(),
           onDelete: onDelete(s.rows().length)
         });
-
-        s.lastRowIsEmpty.set( KVForm.lastRowIsEmpty(s) );
       }
-
     };
   }
 
@@ -60,15 +54,14 @@ function addRow(state, data) {
   }));
 }
 
-
-KVForm.lastRowIsEmpty = function(state) {
-  var rs = state.rows();
-  return rs.length && !( KVInput.isComplete(state.rows.get(rs.length-1)) );
-};
+function lastRowIsEmpty(rows) {
+  var rs = rows();
+  return KVInput.isComplete( rows.get(rs.length-1) );
+}
 
 
 KVForm.render = function render(state) {
-  return h('form.vdom-kv-form', {
+  return h('div.vdom-kv-form', {
     onsubmit: function(ev) {
       ev.preventDefault();
     }
