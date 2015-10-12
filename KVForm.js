@@ -33,15 +33,16 @@ function KVForm(opts) {
   }
 
   function onComplete() {
-    return function() {
+    return function(ev) {
 
       if (!s.lastRowIsEmpty()) {
+        ev.preventDefault();
         addRow(s, {
           onComplete: onComplete(),
           onDelete: onDelete(s.rows().length)
         });
 
-        s.lastRowIsEmpty.set(KVForm.lastRowIsEmpty(s));
+        s.lastRowIsEmpty.set( KVForm.lastRowIsEmpty(s) );
       }
 
     };
@@ -54,7 +55,8 @@ function KVForm(opts) {
 function addRow(state, data) {
   state.rows.push( KVInput({
     onComplete: data.onComplete,
-    onDelete: data.onDelete
+    onDelete: data.onDelete,
+    focus: 'field'
   }));
 }
 
@@ -66,7 +68,6 @@ KVForm.lastRowIsEmpty = function(state) {
 
 
 KVForm.render = function render(state) {
-  console.log(state);
   return h('form.vdom-kv-form', {
     onsubmit: function(ev) {
       ev.preventDefault();
