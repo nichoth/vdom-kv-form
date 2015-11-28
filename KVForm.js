@@ -1,72 +1,88 @@
-var h = require('virtual-dom/h');
-var state = require('@nichoth/state');
+// var h = require('virtual-dom/h');
+var struct = require('observ-struct');
+var value = require('observ');
 var map = require('lodash.map');
 var oArray = require('observ-array');
-var KVInput = require('vdom-kv-input');
+var KVInput = require('vdom-form/lib/KVInput');
+var Form = require('vdom-form');
+var curry = require('vdom-form/lib/curry-component');
+var delButton = require('vdom-buttons/lib/delete');
 var noop = function(){};
 
 module.exports = KVForm;
 
-function KVForm(opts) {
 
-  var rows = oArray( (opts.rows || []).map(function(r, i) {
-    return KVInput({
+function KVForm(opts) {
+  opts = opts || {};
+  opts.rows = opts.rows || [{ field: '', value: '' }];
+  opts.onSubmit = opts.onSubmit || noop;
+
+  var rows = oArray(opts.rows.map(function(r, i) {
+    var c = KVInput({
       field: r.field,
       value: r.value,
-      onDelete: onDelete(i),
-      onComplete: onComplete()
+      onDelete: onDelete.bind(null, i),
+      onComplete: onComplete
+    });
+
+    return struct({
+      input: c,
+      button: value(function(h) {
+        return delButton(h, {onClick: onDelete.bind(null, i)});
+      })
     });
   }));
 
-  var s = state({
+  var state = struct({
     rows: rows,
+    onSubmit: opts.onSubmit
   });
 
-
   function onDelete(index) {
-    return function() {
-      s.rows.splice(index, 1);
-    };
+    rows.splice(index, 1);
   }
 
-  function onComplete() {
-    return function(ev) {
-
-      if ( lastRowIsEmpty( s.rows ) ) {
-        ev.preventDefault();
-        addRow(s, {
-          onComplete: onComplete(),
-          onDelete: onDelete(s.rows().length)
-        });
-      }
-    };
+  function onComplete(ev) {
+    if ( lastRowIsEmpty(state.rows()) ) { return; }
+    ev.preventDefault();
+    rows.push(struct({
+      input: KVInput({
+        field: '',
+        value: '',
+        focus: 'field',
+        onComplete: onComplete,
+        onDelete: onDelete.bind(null, rows().length)
+      }),
+      button: value(function(h) {
+        return delButton(h, {onClick: onDelete.bind(null, rows().length)});
+      })
+    }));
   }
 
-  return s;
+  return state;
 }
 
-
-function addRow(state, data) {
-  state.rows.push( KVInput({
-    onComplete: data.onComplete,
-    onDelete: data.onDelete,
-    focus: 'field'
-  }));
-}
 
 function lastRowIsEmpty(rows) {
-  var rs = rows();
-  return KVInput.isComplete( rows.get(rs.length-1) );
+  console.log(rows);
+  var v = !KVInput.hasValue(rows[rows.length - 1].input);
+  console.log(v);
+  return v;
 }
 
 
-KVForm.render = function render(state) {
-  return h('div.vdom-kv-form', {
+KVForm.render = function render(h, state) {
+  console.log(arguments);
+  return h('form.vdom-kv-form', {
     onsubmit: function(ev) {
       ev.preventDefault();
+      state.onSubmit(Form.values(state.form));
     }
-  }, map(state.rows, function(r, i) {
-      return KVInput.render(r);
-    })
-  );
+  },
+  state.rows.map(function(r) {
+    return h('div', [
+      KVInput.render(h, r.input),
+      r.button(h)
+    ]);
+  }));
 };

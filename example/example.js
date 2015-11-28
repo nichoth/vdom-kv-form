@@ -11,6 +11,6 @@ var state = Form({
   ]
 });
 
-var loop = require('main-loop')( state(), Form.render, vdom );
+var loop = require('main-loop')(state(), Form.render.bind(null, h), vdom);
 state(loop.update);
 document.getElementById('content').appendChild(loop.target);
