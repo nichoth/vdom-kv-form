@@ -1,72 +1,76 @@
-var h = require('virtual-dom/h');
-var state = require('@nichoth/state');
+var struct = require('observ-struct');
+var value = require('observ');
 var map = require('lodash.map');
 var oArray = require('observ-array');
-var KVInput = require('vdom-kv-input');
+var KVInput = require('vdom-form/lib/KVInput');
+var Row = require('./lib/row');
+var state = require('@nichoth/state');
 var noop = function(){};
 
 module.exports = KVForm;
 
-function KVForm(opts) {
 
-  var rows = oArray( (opts.rows || []).map(function(r, i) {
-    return KVInput({
+function KVForm(opts) {
+  opts = opts || {};
+  opts.onSubmit = opts.onSubmit || noop;
+  opts.rows = opts.rows || [{ field: '', value: ''}];
+
+  var rows = opts.rows.map(function(r, i) {
+    return Row({
       field: r.field,
       value: r.value,
-      onDelete: onDelete(i),
-      onComplete: onComplete()
+      onDelete: onDelete.bind(null, i),
+      onComplete: onComplete
     });
-  }));
-
-  var s = state({
-    rows: rows,
   });
 
+  var s = state({
+    rows: oArray(rows),
+    focus: value([]),
+    handles: {
+      onSubmit: opts.onSubmit
+    }
+  });
 
   function onDelete(index) {
-    return function() {
-      s.rows.splice(index, 1);
-    };
+    s.rows.splice(index, 1);
+    var lastRow = s.rows.get(s.rows().length - 1);
+    console.log(lastRow);
+    KVInput.focusValue(Row.input(lastRow));
   }
 
-  function onComplete() {
-    return function(ev) {
-
-      if ( lastRowIsEmpty( s.rows ) ) {
-        ev.preventDefault();
-        addRow(s, {
-          onComplete: onComplete(),
-          onDelete: onDelete(s.rows().length)
-        });
-      }
-    };
+  function onComplete(ev) {
+    var rs = s.rows();
+    if ( !KVInput.isComplete(Row.input(rs[rs.length - 1])) ) { return; }
+    ev.preventDefault();
+    s.rows.push(Row({
+      field: '',
+      value: '',
+      focus: 'field',
+      onDelete: onDelete.bind(null, rs.length),
+      onComplete: onComplete
+    }));
   }
 
   return s;
 }
 
 
-function addRow(state, data) {
-  state.rows.push( KVInput({
-    onComplete: data.onComplete,
-    onDelete: data.onDelete,
-    focus: 'field'
-  }));
-}
-
-function lastRowIsEmpty(rows) {
-  var rs = rows();
-  return KVInput.isComplete( rows.get(rs.length-1) );
-}
-
-
-KVForm.render = function render(state) {
-  return h('div.vdom-kv-form', {
+KVForm.render = function(h, state) {
+  console.log(arguments);
+  return h('form.vdom-kv-form', {
     onsubmit: function(ev) {
       ev.preventDefault();
+      state.handles.onSubmit(state.rows.map(function(r) {
+        return KVInput.value(Row.input(r));
+      }));
     }
-  }, map(state.rows, function(r, i) {
-      return KVInput.render(r);
-    })
-  );
+  }, [
+    state.rows.map(function(r) {
+      return Row.render(h, r);
+    }),
+    h('button', {
+      type: 'submit',
+    }, ['Save'])
+  ]);
 };
