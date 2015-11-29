@@ -14,10 +14,8 @@ var state = Form({
 
 var loop = require('main-loop')(state(), render, vdom);
 state(loop.update);
-console.log(loop.target);
 document.getElementById('content').appendChild(loop.target);
 
 function render(state) {
-  console.log(arguments);
   return Form.render(h, state);
 }

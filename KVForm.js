@@ -1,6 +1,5 @@
 var struct = require('observ-struct');
 var value = require('observ');
-var map = require('lodash.map');
 var oArray = require('observ-array');
 var KVInput = require('vdom-form/lib/KVInput');
 var Row = require('./lib/row');
@@ -57,7 +56,6 @@ function KVForm(opts) {
 
 
 KVForm.render = function(h, state) {
-  console.log(arguments);
   return h('form.vdom-kv-form', {
     onsubmit: function(ev) {
       ev.preventDefault();
@@ -69,8 +67,14 @@ KVForm.render = function(h, state) {
     state.rows.map(function(r) {
       return Row.render(h, r);
     }),
-    h('button', {
-      type: 'submit',
-    }, ['Save'])
+    h('div.vdom-kv-form-row', {
+      style: {
+        textAlign: 'right'
+      }
+    }, [
+      h('button.vdom-kv-form-button', {
+        type: 'submit',
+      }, ['Save'])
+    ])
   ]);
 };

@@ -16,6 +16,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "browserify -d example/example.js > example/bundle.js",
     "watch": "watchify example/example.js -o example/bundle.js -dv",
+    "build-css": "cp style/main.css example/style.css",
     "dev": "npm run watch & npm run server",
     "server": "node server.js",
     "postversion": "git push && git push --tags",
@@ -36,10 +37,11 @@
     "virtual-dom": "^2.1.1"
   },
   "dependencies": {
+    "@nichoth/state": "0.0.2",
     "observ": "^0.2.0",
     "observ-array": "^3.2.1",
     "observ-struct": "^6.0.0",
-    "vdom-buttons": "0.0.1",
-    "vdom-form": "^0.2.1"
+    "vdom-buttons": "0.0.2",
+    "vdom-form": "^0.2.2"
   }
 }
