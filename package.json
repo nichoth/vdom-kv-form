@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "pp": "npm version patch && npm version publish",
+    "pp": "npm version patch && npm publish",
     "build": "browserify -d example/example.js > example/bundle.js",
     "watch": "watchify example/example.js -o example/bundle.js -dv",
     "build-css": "cp style/main.css example/style.css",
