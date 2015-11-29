@@ -1,12 +1,10 @@
-// var h = require('virtual-dom/h');
 var struct = require('observ-struct');
 var value = require('observ');
 var map = require('lodash.map');
 var oArray = require('observ-array');
 var KVInput = require('vdom-form/lib/KVInput');
-var Form = require('vdom-form');
-var curry = require('vdom-form/lib/curry-component');
-var delButton = require('vdom-buttons/lib/delete');
+var Row = require('./lib/row');
+var state = require('@nichoth/state');
 var noop = function(){};
 
 module.exports = KVForm;
@@ -14,75 +12,65 @@ module.exports = KVForm;
 
 function KVForm(opts) {
   opts = opts || {};
-  opts.rows = opts.rows || [{ field: '', value: '' }];
   opts.onSubmit = opts.onSubmit || noop;
+  opts.rows = opts.rows || [{ field: '', value: ''}];
 
-  var rows = oArray(opts.rows.map(function(r, i) {
-    var c = KVInput({
+  var rows = opts.rows.map(function(r, i) {
+    return Row({
       field: r.field,
       value: r.value,
       onDelete: onDelete.bind(null, i),
       onComplete: onComplete
     });
+  });
 
-    return struct({
-      input: c,
-      button: value(function(h) {
-        return delButton(h, {onClick: onDelete.bind(null, i)});
-      })
-    });
-  }));
-
-  var state = struct({
-    rows: rows,
-    onSubmit: opts.onSubmit
+  var s = state({
+    rows: oArray(rows),
+    focus: value([]),
+    handles: {
+      onSubmit: opts.onSubmit
+    }
   });
 
   function onDelete(index) {
-    rows.splice(index, 1);
+    s.rows.splice(index, 1);
+    var lastRow = s.rows.get(s.rows().length - 1);
+    console.log(lastRow);
+    KVInput.focusValue(Row.input(lastRow));
   }
 
   function onComplete(ev) {
-    if ( lastRowIsEmpty(state.rows()) ) { return; }
+    var rs = s.rows();
+    if ( !KVInput.isComplete(Row.input(rs[rs.length - 1])) ) { return; }
     ev.preventDefault();
-    rows.push(struct({
-      input: KVInput({
-        field: '',
-        value: '',
-        focus: 'field',
-        onComplete: onComplete,
-        onDelete: onDelete.bind(null, rows().length)
-      }),
-      button: value(function(h) {
-        return delButton(h, {onClick: onDelete.bind(null, rows().length)});
-      })
+    s.rows.push(Row({
+      field: '',
+      value: '',
+      focus: 'field',
+      onDelete: onDelete.bind(null, rs.length),
+      onComplete: onComplete
     }));
   }
 
-  return state;
+  return s;
 }
 
 
-function lastRowIsEmpty(rows) {
-  console.log(rows);
-  var v = !KVInput.hasValue(rows[rows.length - 1].input);
-  console.log(v);
-  return v;
-}
-
-
-KVForm.render = function render(h, state) {
+KVForm.render = function(h, state) {
   console.log(arguments);
   return h('form.vdom-kv-form', {
     onsubmit: function(ev) {
       ev.preventDefault();
-      state.onSubmit(Form.values(state.form));
+      state.handles.onSubmit(state.rows.map(function(r) {
+        return KVInput.value(Row.input(r));
+      }));
     }
-  },
-  state.rows.map(function(r) {
-    return h('div', [
-      KVInput.render(h, r.input),
-      r.button(h)
-    ]);
-  }));
+  }, [
+    state.rows.map(function(r) {
+      return Row.render(h, r);
+    }),
+    h('button', {
+      type: 'submit',
+    }, ['Save'])
+  ]);
 };
