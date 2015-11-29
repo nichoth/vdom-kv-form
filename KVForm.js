@@ -32,9 +32,9 @@ function KVForm(opts) {
   });
 
   function onDelete(index) {
+    if (s.rows().length <= 1) return;
     s.rows.splice(index, 1);
     var lastRow = s.rows.get(s.rows().length - 1);
-    console.log(lastRow);
     KVInput.focusValue(Row.input(lastRow));
   }
 
@@ -67,7 +67,7 @@ KVForm.render = function(h, state) {
     state.rows.map(function(r) {
       return Row.render(h, r);
     }),
-    h('div.vdom-kv-form-row', {
+    h('div.vdom-kv-form-button-row', {
       style: {
         textAlign: 'right'
       }

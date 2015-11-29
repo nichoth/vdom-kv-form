@@ -2,11 +2,15 @@ body {
   margin: 0;
   padding: 0;
 }
+.seperator {
+  margin-left: 2em;
+  margin-right: 2em;
+}
 .vdom-button {
-  opacity: 0.6;
+  opacity: 0.5;
   float: right;
   position: relative;
-  top: 0.9em;
+  top: 0.3em;
 }
 .vdom-button:hover {
   opacity: 0.3;
@@ -17,8 +21,15 @@ body {
   padding: 1em;
   margin: 3em;
 }
-.vdom-kv-form-row:last-child {
+.vdom-kv-form-button-row {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: whitesmoke;
   margin-bottom: 1em;
+}
+.vdom-kv-form-row:last-child {
+  margin-bottom: 2em;
 }
 .vdom-kv-form-row:first-child {
   margin-top: 4em;
@@ -48,7 +59,7 @@ body {
 
 .vdom-kv-input {
   display: inline-block;
-  font-size: 1.5em;
+  font-size: 1.2em;
 }
 
 .vdom-kv-input input {
@@ -65,37 +76,3 @@ body {
 .vdom-kv-input input:focus {
   border-bottom: 1px solid rgb(0, 188, 212);
 }
-
-
-/*.vdom-form-field, .vdom-image-upload, .vdom-file-upload {
-  & .vdom-file-upload {
-    padding: 0;
-    margin-bottom: 0;
-  }
-  padding: 1em;
-  background-color: whitesmoke;
-  margin-bottom: 1em;
-  label, input {
-    display: inline-block;
-    // width: 48%;
-    font-size: 1.5em;
-  }
-  label {
-    letter-spacing: 0.03em;
-    font-weight: 100;
-    vertical-align: bottom;
-    width: 25%;
-  }
-  input {
-    width: 74%;
-    color: gray;
-    transition: all 250ms;
-    background-color: whitesmoke;
-    outline: none;
-    border: none;
-    border-bottom: 1px solid lightgray;
-    &:focus {
-      border-bottom: 1px solid rgb(0, 188, 212);
-    }
-  }
-}*/
