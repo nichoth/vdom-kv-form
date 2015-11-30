@@ -81,3 +81,4 @@ node_modules
 *.swp
 bundle.js
 bower_components/
+example/style.css
