@@ -2,7 +2,7 @@
   "name": "vdom-kv-form",
   "description": "virtual-dom component for an editable list of keys and values",
   "main": "KVForm.js",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "keywords": [
     "mercury",
     "virtual-dom",
