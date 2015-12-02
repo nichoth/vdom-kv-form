@@ -8,8 +8,7 @@ var state = Form({
       field: 'my field',
       value: 'my value'
     }
-  ],
-  onSubmit: console.log.bind(console)
+  ]
 });
 
 var loop = require('main-loop')(state(), render, vdom);
@@ -17,5 +16,18 @@ state(loop.update);
 document.getElementById('content').appendChild(loop.target);
 
 function render(state) {
-  return Form.render(h, state);
+  return h('form', {
+    style: {
+      backgroundColor: 'whitesmoke',
+      padding: '1em',
+      margin: '3em'
+    },
+    onsubmit: function(ev) {
+      ev.preventDefault();
+      console.log(Form.values(state));
+    }
+  }, [
+    Form.render(h, state),
+    require('../lib/submit-button')(h)
+  ]);
 }

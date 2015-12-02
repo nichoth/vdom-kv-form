@@ -11,7 +11,6 @@ module.exports = KVForm;
 
 function KVForm(opts) {
   opts = opts || {};
-  opts.onSubmit = opts.onSubmit || noop;
   opts.rows = opts.rows || [{ field: '', value: ''}];
 
   var rows = opts.rows.map(function(r, i) {
@@ -26,9 +25,6 @@ function KVForm(opts) {
   var s = state({
     rows: oArray(rows),
     focus: value([]),
-    handles: {
-      onSubmit: opts.onSubmit
-    }
   });
 
   function onDelete(index) {
@@ -54,9 +50,14 @@ function KVForm(opts) {
   return s;
 }
 
+KVForm.values = function (data) {
+  return data.rows.map(function(r) {
+    return KVInput.value(Row.input(r));
+  });
+};
 
 KVForm.render = function(h, state) {
-  return h('form.vdom-kv-form', {
+  return h('div.vdom-kv-form', {
     onsubmit: function(ev) {
       ev.preventDefault();
       state.handles.onSubmit(state.rows.map(function(r) {
@@ -66,15 +67,6 @@ KVForm.render = function(h, state) {
   }, [
     state.rows.map(function(r) {
       return Row.render(h, r);
-    }),
-    h('div.vdom-kv-form-button-row', {
-      style: {
-        textAlign: 'right'
-      }
-    }, [
-      h('button.vdom-kv-form-button', {
-        type: 'submit',
-      }, ['Save'])
-    ])
+    })
   ]);
 };
